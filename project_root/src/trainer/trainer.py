@@ -30,7 +30,8 @@ class Trainer:
             optimizer: torch.optim.Optimizer,
             scheduler: Optional[Any],  # Can be _LRScheduler or ReduceLROnPlateau
             train_loader: DataLoader,
-            val_loader: DataLoader,
+            valid_loader: DataLoader,
+            test_loader: DataLoader,
             criterion: torch.nn.Module,
             config: Box,
             logger: BaseLogger,
@@ -43,7 +44,8 @@ class Trainer:
         :param optimizer:
         :param scheduler:
         :param train_loader:
-        :param val_loader:
+        :param valid_loader:
+        :param test_loader:
         :param criterion:
         :param config:
         :param logger:
@@ -54,7 +56,8 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.train_loader = train_loader
-        self.val_loader = val_loader
+        self.valid_loader = valid_loader
+        self.test_loader = test_loader
         self.criterion = criterion
         self.config = config
         self.logger = logger
@@ -135,6 +138,38 @@ class Trainer:
             return self.model(**inputs)
         return self.model(inputs)
 
+    def _evaluation_step(self, batch: Dict[str, Any]) -> Tuple[Tensor, Dict[str, Tensor]]:
+        """
+
+        :param batch:
+        :return:
+        """
+        inputs, targets = self._prepare_batch(batch)
+        with autocast(str(self.device), enabled=self.use_amp):
+            outputs_dict = self._forward(inputs)
+            logits = outputs_dict['logits']
+            loss = self.criterion(logits, targets)
+        return loss, outputs_dict
+
+    def _run_evaluation_loop(self, loader: DataLoader, desc: str) -> Tuple[float, int]:
+        """
+        Runs the evaluation loop (validation/test).
+        """
+        total_loss = 0.0
+        batch_idx = -1
+
+        with torch.no_grad():
+            pbar = tqdm(loader, desc=desc)
+            for batch_idx, batch in enumerate(pbar):
+                loss, outputs_dict = self._evaluation_step(batch)
+                total_loss += loss.item()
+                self.metrics_manager.update(outputs_dict, batch)
+                pbar.set_postfix({'loss': f'{loss.item():.4f}'})
+
+                if self.debug_mode:
+                    break
+        return total_loss, batch_idx + 1
+
     def train_step(self, batch: Dict[str, Any]) -> Tuple[Tensor, Dict[str, Tensor]]:
         """
 
@@ -213,26 +248,10 @@ class Trainer:
         """
         self.model.eval()
         self.metrics_manager.reset()  # Reset metrics for validation
-        total_val_loss = 0.0
-
-        with torch.no_grad():
-            pbar = tqdm(self.val_loader, desc=f"Epoch {epoch} Validation")
-            for batch_idx, batch in enumerate(pbar):
-                inputs, targets = self._prepare_batch(batch)
-
-                with autocast(enabled=self.use_amp):
-                    outputs_dict = self._forward(inputs)
-                    logits = outputs_dict['logits']
-                    loss = self.criterion(logits, targets)
-
-                total_val_loss += loss.item()
-                self.metrics_manager.update(outputs_dict, batch)
-                pbar.set_postfix({'loss': f'{loss.item():.4f}'})
-
-                if self.debug_mode:  # Only process one batch in debug mode
-                    break
-
-        avg_val_loss = total_val_loss / (batch_idx + 1)
+        
+        total_val_loss, num_batches = self._run_evaluation_loop(self.valid_loader, f"Epoch {epoch} Validation")
+        avg_val_loss = total_val_loss / num_batches if num_batches > 0 else 0.0
+        
         val_scores = self.metrics_manager.compute()
         val_scores['val/loss'] = avg_val_loss  # Add validation loss to scores
 
@@ -240,6 +259,26 @@ class Trainer:
         self.logger.log_metrics(val_scores, step=epoch)
         self.logger.info(f"Epoch {epoch} Validation - Results: {val_scores}")
         return val_scores
+
+    def test_epoch(self, epoch: int) -> Dict[str, float]:
+        """
+        Runs a full test epoch.
+        :param epoch:
+        :return:
+        """
+        self.model.eval()
+        self.metrics_manager.reset()
+        
+        total_test_loss, num_batches = self._run_evaluation_loop(self.test_loader, "Final Test")
+        avg_test_loss = total_test_loss / num_batches if num_batches > 0 else 0.0
+        
+        test_scores = self.metrics_manager.compute()
+        test_scores['test/loss'] = avg_test_loss  # Add test loss to scores
+
+        # Log test metrics
+        self.logger.log_metrics(test_scores, step=epoch)
+        self.logger.info(f"Final Test - Results: {test_scores}")
+        return test_scores
 
     def _save_current_state(self, epoch: int, is_best: bool = False,
                             file_name: str = "last.pth") -> None:
@@ -264,6 +303,15 @@ class Trainer:
                 state['scheduler_state_dict'] = self.scheduler.state_dict()
 
         save_checkpoint(state, self.save_dir, file_name=file_name, is_best=is_best)
+
+    def emergency_save(self, epoch: int, file_name: str = "emergency_save.pth"):
+        """
+
+        :param epoch:
+        :param file_name:
+        :return:
+        """
+        self._save_current_state(epoch, file_name=file_name)
 
     def run(self) -> None:
         """
