@@ -1,5 +1,8 @@
 from typing import Callable, Type, Any, Dict, Optional
 
+from dataset.base_dataset import DATASET_REGISTRY
+
+
 class Registry:
     """
     The registry that provides name -> object mapping, to support flexible instantiation based on configuration
@@ -77,6 +80,7 @@ class Registry:
 # and should be imported from src.utils.registry by other modules.
 
 MODEL_REGISTRY = Registry("models")
+DATASET_REGISTRY = Registry("dataset")
 METRIC_REGISTRY = Registry("metrics")
 CRITERION_REGISTRY = Registry("criterion")
 OPTIMIZER_REGISTRY = Registry("optimizers")
