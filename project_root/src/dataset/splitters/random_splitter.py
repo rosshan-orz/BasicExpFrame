@@ -2,7 +2,9 @@ from typing import Tuple, Optional
 from torch.utils.data import Dataset, Subset
 from .base import BaseSplitter
 import random
+from ...utils.registry import DATASET_REGISTRY
 
+@DATASET_REGISTRY.register("RandomSplitter")
 class RandomSplitter(BaseSplitter):
     """
     Split dataset into sets based on random seed shuffle and split ratio
