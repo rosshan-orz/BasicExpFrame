@@ -11,7 +11,7 @@ class ConfigParser:
     @staticmethod
     def load(path: Union[str, Path]) -> Box:
         """
-        Load a YAML configuration file from configs directory given by a Union and return the list to Box object.
+        Load a YAML configuration file from config directory given by a Union and return the list to Box object.
         This Box object will be frozen and will not allow change auto.
         :param path: The path of the YAML config file
         :return: Box object
