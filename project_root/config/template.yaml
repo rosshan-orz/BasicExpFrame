@@ -1,0 +1,105 @@
+# project_root/configs/template.yaml
+
+# General Experiment Settings
+experiment_name: "eeg_classification_default"
+seed: 42
+device: "cuda" # Use "cuda" for GPU, "cpu" for CPU
+output_dir: "./output" # Base directory for all experiment outputs
+
+# Data Configuration
+data:
+  root: "./data/processed" # Path to the directory containing subject .npz files
+
+  # Data splitting strategy:
+  # "within_subject": Splits data for each subject independently.
+  # "leave_one_out": (Future extension)
+  # "cross_subject_specific": (Future extension)
+  split_strategy: "within_subject"
+
+  # Which subjects to include in the experiment.
+  # ["all"] will run experiments for all .npz files found in data.root.
+  # e.g., ["sub01", "sub02"] to run only for sub01.npz and sub02.npz
+  test_subjects: ["all"]
+
+# Configuration for the dataset
+  dataset:
+    name: "NpzDataset" # Name of the dataset registered in the DATASET_REGISTRY
+    params: {} # Optional parameters for the dataset's __init__ method
+
+  # Configuration for data splitting
+  splitter:
+    name: "SequentialSplitter" # Name of the splitter registered in the SPLITTER_REGISTRY
+    params:
+      ratio: 0.8 # Train-validation split ratio
+      seed: 42 # Seed for reproducibility
+
+  # DataLoader configuration
+  loader:
+    batch_size: 32
+    num_workers: 4 # Number of subprocesses to use for data loading. 0 means loading data in the main process.
+
+# Model Configuration
+model:
+  name: "EEGNet" # Must be registered in MODEL_REGISTRY
+  params:
+    num_classes: 2
+    channels: 64
+    # Add other model-specific parameters here
+
+# Loss Function Configuration
+loss:
+  name: "CrossEntropyLoss" # Must be registered in CRITERION_REGISTRY
+  params:
+    # weight: [1.0, 1.0] # Example for weighted CrossEntropyLoss
+    # ignore_index: -100
+    reduction: "mean"
+
+# Optimizer Configuration
+optimizer:
+  name: "AdamW" # Must be registered in OPTIMIZER_REGISTRY
+  params:
+    lr: 0.001
+    weight_decay: 0.01
+    # Add other optimizer-specific parameters here
+
+# Learning Rate Scheduler Configuration (Optional)
+# If no scheduler is desired, remove this section or set to null
+# scheduler: null
+scheduler:
+  name: "StepLR" # Must be registered in SCHEDULER_REGISTRY
+  params:
+    step_size: 10
+    gamma: 0.1
+    # Add other scheduler-specific parameters here
+  # Example for ReduceLROnPlateau
+  # name: "ReduceLROnPlateau"
+  # params:
+  #   mode: "max" # or "min"
+  #   factor: 0.1
+  #   patience: 5
+
+# Trainer Configuration
+trainer:
+  epochs: 50 # Total number of training epochs
+  use_amp: True # Whether to use Automatic Mixed Precision (AMP)
+  grad_clip: 1.0 # Gradient clipping threshold (None for no clipping)
+  monitor: "val/accuracy" # Metric to monitor for saving the best model and early stopping
+  monitor_mode: "max" # "max" for metrics where higher is better (e.g., accuracy), "min" for lower is better (e.g., loss)
+  resume_from: null # Path to a checkpoint (.pth file) to resume training from
+  debug: False # If True, will only run one batch per loader to quickly verify setup
+
+  # Early Stopping (Future extension)
+  # early_stopping:
+  #   patience: 10
+  #   min_delta: 0.001
+
+# Metrics to track during validation
+metrics:
+  - name: "Accuracy" # Must be registered in METRIC_REGISTRY
+    params:
+      name: "val/accuracy" # How this metric will be reported in logs/TensorBoard
+  # Add other metrics here, e.g.:
+  # - name: "F1Score"
+  #   params:
+  #     name: "val/f1_score"
+  #     average: "macro"
