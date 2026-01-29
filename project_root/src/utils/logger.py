@@ -13,7 +13,7 @@ class BaseLogger:
     def __init__(self, log_dir: Union[str, Path], config: Box):
         """
         Initialize logger.
-        :param log_dir: direction of log
+        :param log_dir: directory of log
         :param config: config from configuration YAML
         """
         self.log_dir = Path(log_dir)
@@ -31,14 +31,14 @@ class BaseLogger:
             self.logger.addHandler(console_handler)
 
             # File handler
-            file_handler = logging.FileHandler(f"{self.log_dir}/train.log")
+            file_handler = logging.FileHandler(self.log_dir / "train.log")
             file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
             self.logger.addHandler(file_handler)
 
         self.info(f"Logging initialized. Log directory: {self.log_dir}")
 
         # Setup TensorBoard SummaryWriter
-        self.writer = SummaryWriter(log_dir=f"{self.log_dir}/tb_logs")
+        self.writer = SummaryWriter(str(self.log_dir / "tb_logs"))
         self.info(f"TensorBoard SummaryWriter initialized. Events will be saved to: {self.log_dir / 'tb_logs'}")
 
     def info(self, msg: str) -> None:
@@ -76,3 +76,23 @@ class BaseLogger:
                 handler.close()
                 self.logger.removeHandler(handler)
         self.info("Logger file handlers closed and removed.")
+
+    def warning(self, msg: str, *args: Any, **kwargs: Any) -> None:
+        """
+
+        :param msg:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        self.logger.warning(msg, *args, **kwargs)
+
+    def error(self, msg: str, *args: Any, **kwargs: Any) -> None:
+        """
+
+        :param msg:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        self.logger.error(msg, *args, **kwargs)
