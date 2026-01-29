@@ -3,7 +3,7 @@ from torch.utils.data import Dataset, Subset
 from .base import BaseSplitter
 import random
 
-class random_splitter(BaseSplitter):
+class RandomSplitter(BaseSplitter):
     """
     Split dataset into sets based on random seed shuffle and split ratio
     """
