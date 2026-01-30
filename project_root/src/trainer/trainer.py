@@ -268,10 +268,10 @@ class Trainer:
         """
         self.model.eval()
         self.metrics_manager.reset()
-        
+
         total_test_loss, num_batches = self._run_evaluation_loop(self.test_loader, "Final Test")
         avg_test_loss = total_test_loss / num_batches if num_batches > 0 else 0.0
-        
+
         test_scores = self.metrics_manager.compute()
         test_scores['test/loss'] = avg_test_loss  # Add test loss to scores
 
@@ -362,3 +362,7 @@ class Trainer:
             self._save_current_state(epoch, is_best=is_best, file_name="last.pth")
 
         self.logger.info("Training finished.")
+
+        if len(self.test_loader) != 0:
+            test_scores = self.test_epoch(self.epochs)
+            self.logger.info("Final test finished")
