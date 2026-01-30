@@ -1,8 +1,5 @@
 from typing import Callable, Type, Any, Dict, Optional
 
-from dataset.base_dataset import DATASET_REGISTRY
-
-
 class Registry:
     """
     The registry that provides name -> object mapping, to support flexible instantiation based on configuration

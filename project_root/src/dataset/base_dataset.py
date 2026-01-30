@@ -5,8 +5,6 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 from abc import ABC, abstractmethod
-
-from ..utils.registry import Registry, DATASET_REGISTRY
 from .sample_type import SampleDict
 
 class BaseDataset(Dataset, ABC):
