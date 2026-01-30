@@ -40,7 +40,7 @@ class Registry:
         """
         if name not in self._module_dict:
             raise KeyError(
-                f"Module {name} not registered in {self._name}"
+                f"Module {name} not registered in {self._name} \n"
                 f"Available items: {list(self._module_dict.keys())}"
             )
         return self._module_dict[name]
