@@ -101,17 +101,20 @@ class DataBuilder:
                 subject_file = root_path / f"{subject_stem}.npz"
                 if not subject_file.exists():
                     raise FileNotFoundError(f"Subject file not found at {subject_file}")
+
                 
                 dataset_config = data_config.dataset
                 dataset_config.params.file_path = str(subject_file)
                 ds = DATASET_REGISTRY.build(dataset_config)
                 datasets.append(ds)
+            experiment_name = f"{experiment_type}_{splitter_config.name}_{actual_test_sub_stems}"
+            print(f"Building Experiment: {experiment_name}")
             
             full_dataset = ConcatDataset(datasets)
             print(f"Combined {len(datasets)} subjects. Total samples: {len(full_dataset)}")
 
             train_loader, valid_loader, test_loader = self._split_dataset(full_dataset, data_config, splitter_config, splitter)
-            yield "cross_subject_experiment", train_loader, valid_loader, test_loader
+            yield experiment_name, train_loader, valid_loader, test_loader
 
         else:
             # Subject Dependent Loop
@@ -119,7 +122,7 @@ class DataBuilder:
                 subject_file = root_path / f"{subject_stem}.npz"
                 if not subject_file.exists():
                     raise FileNotFoundError(f"Subject file not found at {subject_file}")
-                experiment_name = f"{experiment_type}_{subject_stem}"
+                experiment_name = f"{experiment_type}_{splitter_config.name}_{subject_stem}"
                 print(f"Building Experiment: {experiment_name}")
 
                 # build dataset from registry
