@@ -40,7 +40,8 @@ def main(config_path: Union[str, Path]):
     print(f"Using device: {config.device}")
 
     # output directory confirmation
-    base_output_dir = Path(config.output_dir)
+    # Resolve to the parent of project_root (mother root)
+    base_output_dir = Path(__file__).resolve().parent.parent / config.output_dir
     base_output_dir.mkdir(parents=True, exist_ok=True)
     print(f"Basic Output directory: {base_output_dir}")
 
