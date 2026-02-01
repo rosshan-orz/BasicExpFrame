@@ -70,7 +70,7 @@ class DataBuilder:
         return train_loader, valid_loader, test_loader
 
     @staticmethod
-    def build_experiments(self, config: Box) -> Iterator[Tuple[str, DataLoader, DataLoader, DataLoader]]:
+    def build_experiments(config: Box) -> Iterator[Tuple[str, DataLoader, DataLoader, DataLoader]]:
 
         data_config = config.data
         root_path = Path(data_config.root)
@@ -113,7 +113,7 @@ class DataBuilder:
             full_dataset = ConcatDataset(datasets)
             print(f"Combined {len(datasets)} subjects. Total samples: {len(full_dataset)}")
 
-            train_loader, valid_loader, test_loader = self._split_dataset(full_dataset, data_config, splitter_config, splitter)
+            train_loader, valid_loader, test_loader = DataBuilder._split_dataset(full_dataset, data_config, splitter_config, splitter)
             yield experiment_name, train_loader, valid_loader, test_loader
 
         else:
@@ -132,5 +132,5 @@ class DataBuilder:
                 print(f"Create dataset {dataset_config.name} for {subject_stem} with {len(full_dataset)} samples")
 
                 # build splitter
-                train_loader, valid_loader, test_loader = self._split_dataset(full_dataset, data_config, splitter_config, splitter)
+                train_loader, valid_loader, test_loader = DataBuilder._split_dataset(full_dataset, data_config, splitter_config, splitter)
                 yield experiment_name, train_loader, valid_loader, test_loader

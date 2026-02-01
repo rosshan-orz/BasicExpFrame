@@ -45,7 +45,7 @@ def main(config_path: Union[str, Path]):
     print(f"Basic Output directory: {base_output_dir}")
 
     # Experiment loop
-    for exp_name, train_loader, valid_loader, test_loader in DataBuilder.build_experiments(config):
+    for exp_name, train_loader, valid_loader, test_loader in DataBuilder.build_experiments(config=config):
 
         model_name = config.model.name
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
