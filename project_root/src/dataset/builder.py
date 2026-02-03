@@ -119,34 +119,34 @@ class DataBuilder:
         
         all_subject_stems = [f.stem for f in all_files]
 
-        for test_subject_stem in target_subjects:
-            experiment_name = f"leave_one_subject_out_{splitter_config.name}_test_on_{test_subject_stem}"
+        for valid_subject_stem in target_subjects:
+            experiment_name = f"leave_one_subject_out_{splitter_config.name}_test_on_{valid_subject_stem}"
             print(f"--- Building Experiment: {experiment_name} ---")
 
             # 1. Build Test Dataset
-            test_subject_file = root_path / f"{test_subject_stem}.npz"
+            valid_subject_file = root_path / f"{valid_subject_stem}.npz"
             dataset_config = data_config.dataset
-            dataset_config.params.file_path = str(test_subject_file)
-            test_dataset = DATASET_REGISTRY.build(dataset_config)
-            print(f"Test dataset: {test_subject_stem} with {len(test_dataset)} samples")
+            dataset_config.params.file_path = str(valid_subject_file)
+            valid_dataset = DATASET_REGISTRY.build(dataset_config)
+            print(f"Test dataset: {valid_subject_stem} with {len(valid_dataset)} samples")
 
             # 2. Build Train/Valid Source (All other subjects)
-            train_valid_datasets = []
-            train_subject_stems = [s for s in all_subject_stems if s != test_subject_stem]
+            train_datasets = []
+            train_subject_stems = [s for s in all_subject_stems if s != valid_subject_stem]
             
             if not train_subject_stems:
-                raise ValueError(f"Cannot perform LOSO with only one subject ({test_subject_stem}).")
+                raise ValueError(f"Cannot perform LOSO with only one subject ({valid_subject_stem}).")
 
             for train_stem in train_subject_stems:
                 train_file = root_path / f"{train_stem}.npz"
                 dataset_config.params.file_path = str(train_file)
                 ds = DATASET_REGISTRY.build(dataset_config)
-                train_valid_datasets.append(ds)
+                train_datasets.append(ds)
             
-            train_valid_source = ConcatDataset(train_valid_datasets)
+            train_valid_source = ConcatDataset(train_datasets)
             
             # 3. Split Train/Valid using the splitter
-            train_dataset, valid_dataset, _ = splitter(train_valid_source)
+            train_dataset, _, test_dataset = splitter(train_valid_source)
             
             train_loader, valid_loader, test_loader = DataBuilder._build_loaders(data_config.loader, train_dataset, valid_dataset, test_dataset)
             yield experiment_name, train_loader, valid_loader, test_loader
