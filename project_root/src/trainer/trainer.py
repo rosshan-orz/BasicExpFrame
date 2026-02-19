@@ -134,9 +134,14 @@ class Trainer:
         return inputs, targets
 
     def _forward(self, inputs: Any) -> Dict[str, Tensor]:
-        if isinstance(inputs, dict):
-            return self.model(**inputs)
-        return self.model(inputs)
+        outputs = self.model(**inputs) if isinstance(inputs, dict) else self.model(inputs)
+
+        if isinstance(outputs, dict):
+            return outputs
+        elif isinstance(outputs, (list, tuple)):
+            return {'logits': outputs[-1], 'features': outputs[0] if len(outputs) > 1 else None}
+        else:
+            return {'logits': outputs}
 
     def _evaluation_step(self, batch: Dict[str, Any]) -> Tuple[Tensor, Dict[str, Tensor]]:
         """
