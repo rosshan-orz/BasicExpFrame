@@ -70,11 +70,10 @@ class BaseLogger:
             self.writer.close()
             self.info("TensorBoard SummaryWriter closed.")
 
-            # Close and remove file handlers to prevent resource leaks
-        for handler in self.logger.handlers[:]:  # Iterate over a slice to modify in place
-            if isinstance(handler, logging.FileHandler):
-                handler.close()
-                self.logger.removeHandler(handler)
+        # Close and remove file handlers to prevent resource leaks
+        for handler in list(self.logger.handlers):  # Iterate over a copy to modify in place
+            handler.close()
+            self.logger.removeHandler(handler)
         self.info("Logger file handlers closed and removed.")
 
     def warning(self, msg: str, *args: Any, **kwargs: Any) -> None:
