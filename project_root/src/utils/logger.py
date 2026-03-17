@@ -78,20 +78,20 @@ class BaseLogger:
 
     def warning(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
-
-        :param msg:
-        :param args:
-        :param kwargs:
-        :return:
+        Logs a warning message to both console and the log file.
+        :param msg: Message to be logged
+        :param args: Any
+        :param kwargs: Any
+        :return: None
         """
         self.logger.warning(msg, *args, **kwargs)
 
     def error(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
-
-        :param msg:
-        :param args:
-        :param kwargs:
-        :return:
+        Logs an error message to both console and the log file.
+        :param msg: Message to be logged
+        :param args: Any
+        :param kwargs: Any
+        :return: None
         """
         self.logger.error(msg, *args, **kwargs)

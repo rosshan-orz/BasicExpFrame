@@ -27,8 +27,8 @@ class RandomSplitter(BaseSplitter):
     def __call__(self, dataset: Dataset) -> Tuple[Dataset, Dataset, Dataset]:
         """
         Split dataset into sets based on random seed shuffling
-        :param dataset:
-        :return:
+        :param dataset: dataset to split
+        :return: train, valid, and test datasets
         """
         dataset_len = len(dataset)
         indices = list(range(dataset_len))

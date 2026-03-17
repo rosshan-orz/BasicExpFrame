@@ -40,17 +40,17 @@ class Trainer:
     ):
         """
 
-        :param model:
-        :param optimizer:
-        :param scheduler:
-        :param train_loader:
-        :param valid_loader:
-        :param test_loader:
-        :param criterion:
-        :param config:
-        :param logger:
-        :param metrics_manager:
-        :param device:
+        :param model: model need to train
+        :param optimizer: optimizer
+        :param scheduler: scheduler
+        :param train_loader: train loader
+        :param valid_loader: valid loader
+        :param test_loader: test loader
+        :param criterion: criterion
+        :param config: config, a frozen Box
+        :param logger: logger
+        :param metrics_manager: metrics manager, pass this manager instead of individual metrics
+        :param device: device, default cpu, can be 'cuda', 'cuda:0', 'cuda:1', etc.
         """
         self.model = model
         self.optimizer = optimizer
@@ -99,8 +99,8 @@ class Trainer:
     def _resume_checkpoint(self, resume_path: Union[str, Path]) -> None:
         """
         Resumes training from a saved checkpoint.
-        :param resume_path:
-        :return:
+        :param resume_path: path to the checkpoint
+        :return: None
         """
 
         try:
@@ -145,9 +145,9 @@ class Trainer:
 
     def _evaluation_step(self, batch: Dict[str, Any]) -> Tuple[Tensor, Dict[str, Tensor]]:
         """
-
-        :param batch:
-        :return:
+        Evaluation step, used in validation and test loops.
+        :param batch: batch data
+        :return: loss and outputs_dict
         """
         inputs, targets = self._prepare_batch(batch)
         with autocast(str(self.device), enabled=self.use_amp):
@@ -177,9 +177,9 @@ class Trainer:
 
     def train_step(self, batch: Dict[str, Any]) -> Tuple[Tensor, Dict[str, Tensor]]:
         """
-
-        :param batch:
-        :return:
+        Training step, used in training loop.
+        :param batch: batch data
+        :return: loss and outputs_dict
         """
         self.model.train()
         self.optimizer.zero_grad()
@@ -217,8 +217,8 @@ class Trainer:
     def train_epoch(self, epoch: int) -> None:
         """
         Runs a full training epoch.
-        :param epoch:
-        :return:
+        :param epoch: current epoch
+        :return: None
         """
         self.model.train()
         total_loss = 0.0
@@ -248,8 +248,8 @@ class Trainer:
     def validate_epoch(self, epoch: int) -> Dict[str, float]:
         """
         Runs a full validation epoch.
-        :param epoch:
-        :return:
+        :param epoch: current epoch
+        :return: validation scores
         """
         self.model.eval()
         self.metrics_manager.reset()  # Reset metrics for validation
@@ -268,8 +268,8 @@ class Trainer:
     def test_epoch(self, epoch: int) -> Dict[str, float]:
         """
         Runs a full test epoch.
-        :param epoch:
-        :return:
+        :param epoch: current epoch
+        :return: test scores
         """
         self.model.eval()
         self.metrics_manager.reset()
@@ -289,10 +289,10 @@ class Trainer:
                             file_name: str = "last.pth") -> None:
         """
         Helper to save the current training state.
-        :param epoch:
-        :param is_best:
-        :param file_name:
-        :return:
+        :param epoch: current epoch
+        :param is_best: whether the current state is the best
+        :param file_name: file name to save
+        :return: None
         """
         state = {
             'epoch': epoch,
@@ -311,10 +311,10 @@ class Trainer:
 
     def emergency_save(self, epoch: int, file_name: str = "emergency_save.pth"):
         """
-
-        :param epoch:
-        :param file_name:
-        :return:
+        Saves the current training state in case of emergency.
+        :param epoch: current epoch
+        :param file_name: file name to save
+        :return: None
         """
         self._save_current_state(epoch, file_name=file_name)
 

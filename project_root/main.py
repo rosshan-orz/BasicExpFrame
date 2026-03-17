@@ -23,9 +23,9 @@ import src.trainer.criterion
 
 def main(config_path: Union[str, Path]):
     """
-
-    :param config_path:
-    :return:
+    Main function to run experiments
+    :param config_path: path to the configuration file
+    :return: None
     """
     frozen_config = ConfigParser.load(config_path)
     config_dict = frozen_config.to_dict()

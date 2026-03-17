@@ -9,13 +9,13 @@ from .sample_type import SampleDict
 
 class BaseDataset(Dataset, ABC):
     """
-
+    Abstract base class for all datasets.
     """
     def __init__(self, file_path: Union[str, Path], transform: Optional[Callable] = None):
         """
-
-        :param file_path:
-        :param transform:
+        Initialize the dataset.
+        :param file_path: path to the data file or directory
+        :param transform: optional transform to apply to the data
         """
         self.file_path = Path(file_path)
         self.transform = transform

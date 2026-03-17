@@ -9,8 +9,8 @@ class MetricManager:
     """
     def __init__(self, metric_config: List[Union[str, Dict[str, Any]]]):
         """
-
-        :param metric_config:
+        Initialize the metric manager.
+        :param metric_config: list of metric configurations
         """
         self.metrics: Dict[str, BaseMetric] = {}
         for config in metric_config:
@@ -23,7 +23,7 @@ class MetricManager:
     def reset(self) -> None:
         """
         Reset all managed metrics.
-        :return:
+        :return: None
         """
         for metric in self.metrics.values():
             metric.reset()
@@ -31,9 +31,9 @@ class MetricManager:
     def update(self, outputs: Dict[str, Tensor], batch: Dict[str, Any]) -> None:
         """
         Update all managed metrics with new predictions and truth.
-        :param outputs:
-        :param batch:
-        :return:
+        :param outputs: outputs from the model
+        :param batch: batch of data
+        :return: None
         """
         for metric in self.metrics.values():
             metric.update(outputs, batch)
@@ -41,9 +41,9 @@ class MetricManager:
     def compute(self) -> Dict[str, float]:
         """
         Compute all managed metrics and return their final values.
-        :return:
+        :return: dictionary of metric names and their values
         """
-        results = {}
+        results: Dict[str, float] = {}
         for metric in self.metrics.values():
             computed_metrics = metric.compute()
             for key, value in computed_metrics.items():

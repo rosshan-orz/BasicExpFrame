@@ -12,7 +12,7 @@ from .splitters.base import BaseSplitter
 
 class DataBuilder:
     """
-
+    Build datasets and dataloaders.
     """
 
     @staticmethod
@@ -54,12 +54,12 @@ class DataBuilder:
     @staticmethod
     def _split_dataset(dataset: Dataset, data_config, splitter_config, splitter) -> Tuple[DataLoader, DataLoader, DataLoader]:
         """
-
-        :param dataset:
-        :param data_config:
-        :param splitter_config:
-        :param splitter:
-        :return:
+        Split the dataset into train, valid, and test sets.
+        :param dataset: dataset to split
+        :param data_config: data configuration
+        :param splitter_config: splitter configuration
+        :param splitter: splitter to use
+        :return: train, valid, and test dataloaders
         """
         print(f"Using split strategy: {splitter_config.name} with params: {splitter_config.get('params', {})}")
 
@@ -71,6 +71,15 @@ class DataBuilder:
 
     @staticmethod
     def _run_subject_dependent(target_subjects: List[str], all_files: List[Path], root_path: Path, data_config: Box, splitter: BaseSplitter) -> Iterator[Tuple[str, DataLoader, DataLoader, DataLoader]]:
+        """
+        A strategy to run subject-dependent experiments.
+        :param target_subjects: list of target subjects
+        :param all_files: list of all files
+        :param root_path: root path
+        :param data_config: data configuration
+        :param splitter: splitter to use
+        :return: iterator of experiment name, train loader, valid loader, and test loader
+        """
         splitter_config = data_config.splitter
         for subject_stem in target_subjects:
             subject_file = root_path / f"{subject_stem}.npz"
@@ -90,6 +99,15 @@ class DataBuilder:
 
     @staticmethod
     def _run_cross_subject(target_subjects: List[str], all_files: List[Path], root_path: Path, data_config: Box, splitter: BaseSplitter) -> Iterator[Tuple[str, DataLoader, DataLoader, DataLoader]]:
+        """
+        A strategy to run cross-subject experiments.
+        :param target_subjects: list of target subjects
+        :param all_files: list of all files
+        :param root_path: root path
+        :param data_config: data configuration
+        :param splitter: splitter to use
+        :return: iterator of experiment name, train loader, valid loader, and test loader
+        """
         splitter_config = data_config.splitter
         print("Building Cross-Subject Experiment (Combined Dataset)")
         datasets = []
@@ -114,6 +132,15 @@ class DataBuilder:
 
     @staticmethod
     def _run_leave_one_subject_out(target_subjects: List[str], all_files: List[Path], root_path: Path, data_config: Box, splitter: BaseSplitter) -> Iterator[Tuple[str, DataLoader, DataLoader, DataLoader]]:
+        """
+        A strategy to run leave-one-subject-out experiments.
+        :param target_subjects: list of target subjects
+        :param all_files: list of all files
+        :param root_path: root path
+        :param data_config: data configuration
+        :param splitter: splitter to use
+        :return: iterator of experiment name, train loader, valid loader, and test loader
+        """
         splitter_config = data_config.splitter
         print("Building Leave-One-Subject-Out Experiments")
         
@@ -151,8 +178,15 @@ class DataBuilder:
             train_loader, valid_loader, test_loader = DataBuilder._build_loaders(data_config.loader, train_dataset, valid_dataset, test_dataset)
             yield experiment_name, train_loader, valid_loader, test_loader
 
+    # more strategies can be added here
+
     @staticmethod
     def build_experiments(config: Box) -> Iterator[Tuple[str, DataLoader, DataLoader, DataLoader]]:
+        """
+        Build experiments based on the configuration.
+        :param config: configuration
+        :return: iterator of experiment name, train loader, valid loader, and test loader
+        """
 
         data_config = config.data
         root_path = Path(data_config.root)

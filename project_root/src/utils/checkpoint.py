@@ -9,12 +9,12 @@ def save_checkpoint(
         is_best: bool = False
 ) -> None:
     """
-
-    :param state:
-    :param save_dir:
-    :param file_name:
-    :param is_best:
-    :return:
+    Saves the current training state.
+    :param state: state to save
+    :param save_dir: directory to save
+    :param file_name: file name to save
+    :param is_best: whether the current state is the best
+    :return: None
     """
     save_dir = Path(save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
@@ -33,10 +33,10 @@ def load_checkpoint(
         map_location: Optional[Union[str, torch.device]] = None
 ) -> Dict[str, Any]:
     """
-
-    :param file_path:
-    :param map_location:
-    :return:
+    Loads a checkpoint from a file.
+    :param file_path: path to the checkpoint
+    :param map_location: device to load the checkpoint to
+    :return: checkpoint
     """
     file_path = Path(file_path)
     if not file_path.exists():

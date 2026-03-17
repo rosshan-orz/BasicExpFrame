@@ -8,8 +8,8 @@ class BaseMetric(ABC):
     """
     def __init__(self, name: str):
         """
-
-        :param name:
+        Initialize the metric.
+        :param name: name of the metric
         """
         self.name = name
 
@@ -17,7 +17,7 @@ class BaseMetric(ABC):
     def reset(self) -> None:
         """
         Reset the internal state of the metric, clearing any accumulated statistics.
-        :return:
+        :return: None
         """
         raise NotImplementedError
 
@@ -25,9 +25,9 @@ class BaseMetric(ABC):
     def update(self, outputs: Dict[str, Tensor], batch: Dict[str, Any]) -> None:
         """
         Update the internal state of the metric with new predictions and truth.
-        :param outputs:
-        :param batch:
-        :return:
+        :param outputs: outputs from the model
+        :param batch: batch of data
+        :return: None
         """
         raise NotImplementedError
 
