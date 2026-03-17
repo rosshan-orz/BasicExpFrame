@@ -8,13 +8,13 @@ output_dir: "./output" # Base directory for all experiment outputs
 
 # Data Configuration
 data:
-  root: "./data/processed" # Path to the directory containing subject .npz files
+  root: "./data" # Path to the directory containing subject .npz files
 
   # Data splitting strategy:
   # "within_subject": Splits data for each subject independently.
-  # "leave_one_out": (Future extension)
-  # "cross_subject_specific": (Future extension)
-  split_strategy: "within_subject"
+  # "leave_one_out": 
+  # "cross_subject_specific"
+  experiment_type: "within_subject"
 
   # Which subjects to include in the experiment.
   # ["all"] will run experiments for all .npz files found in data.root.
