@@ -8,7 +8,8 @@ output_dir: "./output" # Base directory for all experiment outputs
 
 # Data Configuration
 data:
-  root: "./data" # Path to the directory containing subject .npz files
+  root: "./data" # Path to the directory containing subject data files
+  file_ext: "npz" # File extension of the subject data files (e.g. npz, npy, mat, csv)
 
   # Data splitting strategy:
   # "within_subject": Splits data for each subject independently.

@@ -81,8 +81,10 @@ class DataBuilder:
         :return: iterator of experiment name, train loader, valid loader, and test loader
         """
         splitter_config = data_config.splitter
+        file_ext = data_config.get("file_ext", "npz")
+        if file_ext.startswith("."): file_ext = file_ext[1:]
         for subject_stem in target_subjects:
-            subject_file = root_path / f"{subject_stem}.npz"
+            subject_file = root_path / f"{subject_stem}.{file_ext}"
             if not subject_file.exists():
                 raise FileNotFoundError(f"Subject file not found at {subject_file}")
             
@@ -109,10 +111,12 @@ class DataBuilder:
         :return: iterator of experiment name, train loader, valid loader, and test loader
         """
         splitter_config = data_config.splitter
+        file_ext = data_config.get("file_ext", "npz")
+        if file_ext.startswith("."): file_ext = file_ext[1:]
         print("Building Cross-Subject Experiment (Combined Dataset)")
         datasets = []
         for subject_stem in target_subjects:
-            subject_file = root_path / f"{subject_stem}.npz"
+            subject_file = root_path / f"{subject_stem}.{file_ext}"
             if not subject_file.exists():
                 raise FileNotFoundError(f"Subject file not found at {subject_file}")
 
@@ -142,6 +146,8 @@ class DataBuilder:
         :return: iterator of experiment name, train loader, valid loader, and test loader
         """
         splitter_config = data_config.splitter
+        file_ext = data_config.get("file_ext", "npz")
+        if file_ext.startswith("."): file_ext = file_ext[1:]
         print("Building Leave-One-Subject-Out Experiments")
         
         all_subject_stems = [f.stem for f in all_files]
@@ -151,7 +157,7 @@ class DataBuilder:
             print(f"--- Building Experiment: {experiment_name} ---")
 
             # 1. Build Test Dataset
-            valid_subject_file = root_path / f"{valid_subject_stem}.npz"
+            valid_subject_file = root_path / f"{valid_subject_stem}.{file_ext}"
             dataset_config = data_config.dataset
             dataset_config.params.file_path = str(valid_subject_file)
             valid_dataset = DATASET_REGISTRY.build(dataset_config)
@@ -165,7 +171,7 @@ class DataBuilder:
                 raise ValueError(f"Cannot perform LOSO with only one subject ({valid_subject_stem}).")
 
             for train_stem in train_subject_stems:
-                train_file = root_path / f"{train_stem}.npz"
+                train_file = root_path / f"{train_stem}.{file_ext}"
                 dataset_config.params.file_path = str(train_file)
                 ds = DATASET_REGISTRY.build(dataset_config)
                 train_datasets.append(ds)
@@ -199,9 +205,12 @@ class DataBuilder:
         splitter_config = data_config.splitter
         splitter: BaseSplitter = SPLITTER_REGISTRY.build(splitter_config)
 
-        all_subject_files: List[Path] = sorted(list(root_path.glob("*.npz")))
+        file_ext = data_config.get("file_ext", "npz")
+        if file_ext.startswith("."): file_ext = file_ext[1:]
+
+        all_subject_files: List[Path] = sorted(list(root_path.glob(f"*.{file_ext}")))
         if not all_subject_files:
-            raise FileNotFoundError(f"No NPZ files found in {root_path}")
+            raise FileNotFoundError(f"No .{file_ext} files found in {root_path}")
         if "all" in test_subjects:
             actual_test_sub_stems = [file.stem for file in all_subject_files]
         else:
