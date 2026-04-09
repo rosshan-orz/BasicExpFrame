@@ -25,6 +25,7 @@
 集中管理数据集加载、划分以及相关超参数，对应于 `src/dataset` 目录下的组件。
 
 - **`data.root`**: `str`。存储受试者数据所在的根目录。
+- **`data.file_ext`**: `str`。受试者数据文件的扩展名（如 `"npz"`, `"npy"`, `"mat"`, `"csv"`，默认为 `"npz"`）。
 - **`data.experiment_type`**: `str`。数据划分策略（如 `"within_subject"`, `"leave_one_out"`, `"cross_subject_specific"`）。
 - **`data.test_subjects`**: `list`。本次实验需要运行的受试者列表配置，`["all"]` 表示运行所有受试者。
 

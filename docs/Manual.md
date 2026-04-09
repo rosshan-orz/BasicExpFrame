@@ -143,7 +143,7 @@ python project_root/main.py --config config/template.yaml
 在 BasicExpFrame 中，数据流的构建被拆解为两个正交的维度：**读什么数据 (Dataset)** 与 **怎么切分评估 (Splitter & Strategy)**。
 
 - **Dataset (数据集)**
-  - **职责**：仅负责从磁盘（通常指单个物理文件，如单一受试者的 `.npz`）中读取数据并封装为 Tensor。它是纯粹的单个数据源抽象。
+  - **职责**：仅负责从磁盘（通常指单个物理文件，如单一受试者的 `.npz` 或你配置的 `file_ext` 如 `.mat`, `.npy` 等）中读取数据并封装为 Tensor。它是纯粹的单个数据源抽象。
   - **开发规范**：继承 `src.dataset.base_dataset.BaseDataset`。必须实现 `__len__` 和 `__getitem__`。需要在类上添加 `@DATASET_REGISTRY.register()`。
   - **注意**：`__getitem__` 返回值规范上通常是一个包含 `inputs` 和 `targets` 等键的字典（即 `SampleDict`）。
 
