@@ -1,0 +1,22 @@
+# BasicExpFrame experiment template
+# This is the minimal configuration for the core infrastructure stage.
+# Data/model/trainer sections will be added in later stages.
+
+experiment_name: "basic_exp_frame_smoke"
+seed: 42
+device: "cpu"
+output_dir: "./output"
+
+# Placeholder for future data configuration.
+# data:
+#   root: "./data"
+#   experiment_type: "subject_dependent"
+
+# Placeholder for future model configuration.
+# model:
+#   name: "DummyModel"
+#   params: {}
+
+# Placeholder for future trainer configuration.
+# trainer:
+#   max_epochs: 1
